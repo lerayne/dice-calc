@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+
+	<script src="resources/jquery-2.1.1.min.js"></script>
+	<script src="resources/jquery-ui.min.js"></script>
+	<script src="resources/helpers.js"></script>
+	<script src="resources/main.js"></script>
+
+	<link rel="stylesheet" href="resources/jquery-ui.min.css">
+	<link rel="stylesheet" href="resources/jquery-ui.theme.min.css">
+
+	<style>
+		body {
+			font-family: sans-serif;
+			font-size: 13px;
+		}
+
+		.frame {
+			padding:30px
+		}
+
+		.frame input[type="text"] {
+			width:30px;
+			height:30px;
+			text-align: center;
+		}
+
+		.frame input[type="button"]{
+			font-size: 120%;
+		}
+
+		table td, table th {
+			border:1px solid #ccc;
+			padding:5px 10px;
+		}
+
+		.ui-spinner {
+			height:auto !important;
+		}
+
+		label {
+			display:block
+		}
+
+		.copy p {
+			/*border-top:1px solid #ccc*/
+			margin:0;
+			color:#bbb;
+			font-size: 85%;
+		}
+
+		.result, .if, .template {
+			display: none;
+		}
+	</style>
+</head>
+<body>
+
+<div class="frame" style="width:600px; margin:50px auto; background: #eee">
+
+	<div style="font-size: 150%; margin-bottom:20px">
+		<input type="text" class="spinner-die" id="input_dice_number" value="3"> d <input class="spinner-die" type="text" id="input_dice_cap" value="6">
+	</div>
+
+	<div style="font-size: 150%; margin-bottom:20px">
+		<label><input type="radio" name="type" value="0" checked="checked"> No alterations</label>
+		<label><input type="radio" name="type" value="1"> Bonus (+1 dice, remove 1 worst)</label>
+		<label><input type="radio" name="type" value="-1"> Penalty (+1 dice, remove 1 best)</label>
+
+		<br>
+
+		<label><input type="radio" name="mode" value="sum" checked="checked"> Dice roll sums</label>
+		<label><input type="radio" name="mode" value="successes"> Dice roll successes count</label>
+
+		<br>
+
+		<!--<div class="if if-successes">
+			<label>
+				Against difficulty of <input class="spinner-difficulty" name="difficulty" type="text" value="2">
+			</label>
+		</div>-->
+
+		<input type="button" id="button_calculate" value="calculate!">
+	</div>
+
+	<div  style="border:1px solid #ccc; padding:10px 20px; margin:2px; display:inline-block">
+		Total combinations: <span id="total"></span>
+	</div>
+
+
+	<table class="result" id="sumsTable">
+		<tbody>
+			<tr>
+				<th>Sum</th>
+				<th>Combinations</th>
+				<th>Roll chance, %</th>
+				<th>Win chance, %<br> (roll >= sum)</th>
+				<th>Faulty combinations</th>
+			</tr>
+		</tbody>
+		<tbody class="table_results">
+
+		</tbody>
+		<tbody>
+			<tr class="copy">
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+		</tbody>
+	</table>
+
+	<table class="template" id="successesTableTemplate">
+		<tbody>
+		<tr class="header">
+			<th>
+				Qty of<br>successes >>
+				<hr>
+				Difficulty
+			</th>
+		</tr>
+		</tbody>
+
+		<tbody class="table_results">
+
+		</tbody>
+
+		<tbody>
+		<tr class="copy">
+			<td></td>
+		</tr>
+		</tbody>
+	</table>
+
+	<table class="result" id="successesTable">
+
+	</table>
+
+
+
+</div>
+
+</body>
+</html>
