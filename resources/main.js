@@ -60,7 +60,7 @@ Calculator = function(quant, cap, modifier, mode, add_data){
 
 	// ЧТО ДАЛЬШЕ:
 
-	// вариант с суммированием значений
+	// rакой вариант рассчетов?
 	console.log('mode:', mode)
 	switch (mode) {
 		case 'sum': this.getSumsDistribution(); break;
@@ -77,14 +77,18 @@ Calculator = function(quant, cap, modifier, mode, add_data){
 };
 
 Calculator.prototype = {
+
 	addOne:function(pool){
 
 		var i = pool.length;
 		while (i--){
+			// если в этом разряде достингут максимум
 			if (pool[i] == this.maxDiceVal) {
+				// установить этот разряд в минимум и перейти к старшему разряду
 				pool[i] = this.minDiceVal;
 				continue;
 			}
+			// иначе увеличить разряд на единицу и прервать цикл
 			pool[i]++;
 			break;
 		}
@@ -95,6 +99,7 @@ Calculator.prototype = {
 	getSum:function(arr){
 		var sum = 0, i = arr.length;
 
+		// если модификатор есть - отстортировать массив так, чтобы последнее значение не попало в сумму
 		if (this.modifier != 0){
 			var that = this;
 			i--;
@@ -119,7 +124,7 @@ Calculator.prototype = {
 		return rolls;
 	},
 
-	countSuccesses: function(pool, difficulty){
+	countSuccesses: function(pool, difficulty, style){
 		var successes = 0;
 
 		var i = pool.length;
@@ -128,6 +133,49 @@ Calculator.prototype = {
 		}
 
 		return successes;
+	},
+
+
+	countSuccessesDoubles: function(pool, difficulty){
+		var successes = 0;
+
+		var doubles = {};
+
+		for (var i = 0; i < pool.length; i++){
+			var dieValue = pool[i];
+
+			if (!doubles[dieValue]) { doubles[dieValue] = 0 }
+
+			doubles[dieValue] += 1;
+		}
+
+		var sums = [];
+
+		// наибольшая сумма дублей (наибольший дас, если дублей нет) - дает елочку
+		/*for (var key in doubles){
+			var dieValue = parseInt(key);
+			var count = doubles[key];
+
+			sums.push(dieValue * count);
+		}
+
+		var rollResult = Math.max.apply(null, sums);*/
+
+		// сумма по наибольшему дублю (наибольший дас, если дублей нет)
+		var maxDoubleSize = 0, maxDoubleDie = 0;
+		for (var key in doubles){
+			var dieValue = parseInt(key);
+			var count = doubles[key];
+
+			if (count > maxDoubleSize || ( count == maxDoubleSize && dieValue > maxDoubleDie )) {
+				maxDoubleSize = count;
+				maxDoubleDie = dieValue;
+			}
+		}
+
+		var rollResult = maxDoubleDie * maxDoubleSize;
+
+		return rollResult;
 	},
 
 
@@ -142,6 +190,7 @@ Calculator.prototype = {
 
 			var pool = this.combinations[i];
 			var sum = this.getSum(pool);
+			//var sum = this.countSuccessesDoubles(pool);
 
 			// забиваем комбинацию в массив комбинаций
 			if (typeof this.sums[sum] == 'undefined') this.sums[sum] = [];
@@ -195,25 +244,28 @@ Calculator.prototype = {
 		var maxDifficulty = this.maxDiceVal;
 		this.matrix = {};
 
-
+		// для каждой стожности
 		var d = 1;
 		while (d++ < maxDifficulty) {
 
 			// создать запись матрицы по сложности
 			if (typeof this.matrix[d] == 'undefined') this.matrix[d] = [];
 
+			// для каждой комбинации
 			var i = this.combinations.length;
 			while (i--) {
 				var pool = this.combinations[i];
 
+				//получаем кол-во успехов против заданной сложности
 				var successes = this.countSuccesses(pool, d);
 				if (successes > 0) {
-					if (typeof this.matrix[d][successes] == 'undefined')	this.matrix[d][successes] = {pools:[], count: 0, sum:0};
+					if (typeof this.matrix[d][successes] == 'undefined') this.matrix[d][successes] = {pools:[], count: 0, sum:0};
 					this.matrix[d][successes].count += 1;
 					this.matrix[d][successes].pools.push(pool.slice());
 				}
 			}
 
+			// суммируем общее число успехов (успехов больше, или равно N)
 			var s = maxSuccesses;
 			var sum = 0;
 			while (s--){
